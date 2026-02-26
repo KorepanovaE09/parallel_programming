@@ -50,11 +50,6 @@ void openmp(int thread_num){
     }
 }
 
-double elapsed(struct timeval start, struct timeval end) {
-    return (end.tv_sec - start.tv_sec)
-         + (end.tv_usec - start.tv_usec) / 1e6;
-}
-
 int main(int argc, char **argv){
     int n = atoi(argv[1]);
     clock_t start, end;
