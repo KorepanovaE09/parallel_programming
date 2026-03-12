@@ -6,7 +6,7 @@
 
     public class Main {
 
-        public static final int THREADS = 4;
+        public static final int THREADS = 50;
         public static final int ITERATIONS = 1000;
         public static final double NSEC = 1000_000_000.0;
         public static final int MAP_SIZE = 3;
@@ -47,31 +47,24 @@
             long stop = 0;
 
             for (int k = 0; k < SAMPLES; k++) {
-
                 start = System.nanoTime();
 
                 ExecutorService executorService = Executors.newFixedThreadPool(THREADS);
-
                 List<Callable<String>> tasks = new ArrayList<>();
                 List<Future<String>> results;
 
                 for (int i = 0; i < THREADS; i++) {
-
                     tasks.add(() -> {
-
                         String threadName = Thread.currentThread().getName();
                         Random random = new Random();
 
                         for (int j = 0; j < ITERATIONS; j++) {
-
                             String key = "key" + random.nextInt(MAP_SIZE);
-
                             Integer value = map.get(key);
 
                             if (value == null) {
                                 value = 0;
                             }
-
                             if (random.nextInt(10) == 0) {
                                 try {
                                     Thread.sleep(1);
@@ -79,39 +72,30 @@
                                     e.printStackTrace();
                                 }
                             }
-
                             map.put(key, value + 1);
 
                             // Вывод состояния карты для hashMap
-                            
-                            if (map instanceof HashMap && j % 100 == 0) {
-                                System.out.println(Thread.currentThread().getName() + " -> " + map);
-                            }
-                        }
 
+                            // if (map instanceof HashMap && j % 100 == 0) {
+                            //     System.out.println(Thread.currentThread().getName() + " -> " + map);
+                            // }
+                        }
                         return "Thread " + threadName + " done";
                     });
                 }
 
                 try {
-
                     results = executorService.invokeAll(tasks);
-
                     for (Future<String> result : results) {
                         result.get();
                     }
-
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
-
                 executorService.shutdown();
-
                 stop = System.nanoTime();
             }
-
             System.out.println(" ...done.");
-
             return stop - start;
         }
     }
