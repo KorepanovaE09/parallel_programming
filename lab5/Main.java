@@ -18,14 +18,14 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("");
         System.out.println("Regular semaphore:");
-        runTask(regSemaphore);
+        runTask(regSemaphore, "Regular");
 
         System.out.println("");
         System.out.println("My semaphore:");
-        runTask(mySemaphore);
+        runTask(mySemaphore, "My");
     }
  
-    public static void runTask(Semaphore semaphore) {
+    public static void runTask(Semaphore semaphore, String name) {
         ExecutorService es = Executors.newFixedThreadPool(THREADS);
 
         List<Callable<String>> tasks = new ArrayList<>();
@@ -34,9 +34,16 @@ public class Main {
                 String threadName = Thread.currentThread().getName();
                 try {
                     System.out.println(threadName + " пытается войти");
-                    semaphore.acquire();
+                    int remaining;
 
-                    System.err.println(threadName + " Вошел, доступно: " + semaphore.availablePermits());
+                    if (semaphore instanceof MySemaphore) {
+                        remaining = ((MySemaphore) semaphore).acquireAndGet(); // 🔥
+                    } else {
+                        semaphore.acquire();
+                        remaining = semaphore.availablePermits();
+                    }
+
+                    System.out.println(threadName + " Вошел, доступно: " + remaining);
                     Thread.sleep(2000);
 
                     System.out.println(threadName + " выходит");

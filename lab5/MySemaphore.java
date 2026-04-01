@@ -12,19 +12,26 @@ public class MySemaphore extends Semaphore {
         this.permits = new AtomicInteger(initialPermits);
     }
 
-    @Override
-    public void acquire() throws InterruptedException {
+    public int acquireAndGet() throws InterruptedException {
+        String threadName = Thread.currentThread().getName();
+
         while (true) {
             int current = permits.get();
 
             if (current == 0) {
-                Thread.yield(); 
+                Thread.yield();
                 continue;
             }
 
+            // CAS
             if (permits.compareAndSet(current, current - 1)) {
-                break; 
+                int after = current - 1;
+
+                System.out.println(threadName + " ЗАХВАТИЛ permit (" + current + " -> " + after + ")");
+
+                return after;
             }
+
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
@@ -32,8 +39,16 @@ public class MySemaphore extends Semaphore {
     }
 
     @Override
+    public void acquire() throws InterruptedException {
+        acquireAndGet();
+    }
+
+    @Override
     public void release() {
-        permits.incrementAndGet();
+        String threadName = Thread.currentThread().getName();
+        int after = permits.incrementAndGet();
+
+        System.out.println(threadName + " ОСВОБОДИЛ permit: " + after);
     }
 
     @Override

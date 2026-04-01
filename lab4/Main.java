@@ -96,6 +96,14 @@
                 stop = System.nanoTime();
             }
             System.out.println(" ...done.");
+
+            int sum = 0;
+            for (int i = 0; i < MAP_SIZE; i++) {
+                sum += map.get("key" + i);
+            }
+            System.out.println(" ...done. Sum of values: " + sum + " (expected: " + (THREADS * ITERATIONS) + ")");
+
+
             return stop - start;
         }
     }
